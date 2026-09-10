@@ -24,6 +24,7 @@ EXCLUDE_DIRS = {
     "scratch",
     "venv",
     ".venv",
+    "tmp_validation_extract",
 }
 
 EXCLUDE_EXTENSIONS = {
