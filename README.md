@@ -4,8 +4,8 @@
 > An Agent Skill Marketplace providing modular, evidence-backed website audits across AI Discoverability and On-Site Engagement.
 
 [![Runtime: Python Standard Library](https://img.shields.io/badge/Runtime-Python_3.10+_StdLib-blue.svg)](#operational-safety--boundaries)
-[![Tests: 195 Passed](https://img.shields.io/badge/Tests-195_Passed_(100%25)-brightgreen.svg)](#verification--test-suite)
-[![Package Size: ~135 KB](https://img.shields.io/badge/Package_Size-135_KB_(<50MB)-success.svg)](#repository--marketplace-structure)
+[![Tests: 195 Passing](https://img.shields.io/badge/Tests-195_Passing-brightgreen.svg)](#verification--test-suite)
+[![Package Size: ~140 KB](https://img.shields.io/badge/Package_Size-~140_KB_(<50MB)-success.svg)](#repository--marketplace-structure)
 [![Entrypoint: audit-orchestrator](https://img.shields.io/badge/Marketplace_Entrypoint-audit--orchestrator-orange.svg)](#marketplace-skills--architecture)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
 
@@ -19,7 +19,7 @@ As users increasingly rely on autonomous AI agents, retrieval-augmented generati
 1. **Machine Discoverability**: Ensuring automated crawlers and ingestion pipelines can reach, parse, extract, understand, and verify the site's content.
 2. **Visitor & Agent-Directed Engagement**: Ensuring that when an agent directs a user to a landing page or deep nested link, the viewport immediately provides context, orientation, navigational pathways, and clear conversion next actions.
 
-The marketplace is implemented with **zero runtime external dependencies** (using pure Python standard library), executes **passively and read-only**, and enforces a **zero-hallucination finding contract** where every reported issue is anchored in observable HTML/HTTP evidence.
+The marketplace is implemented with **zero runtime external dependencies** (using pure Python standard library), operates **read-only by design**, and enforces **evidence-grounded finding validation** where every reported issue is anchored in observable HTML/HTTP evidence.
 
 ---
 
@@ -212,9 +212,9 @@ The orchestrator emits a consolidated JSON report structured as follows:
 
 ## 6. Finding Quality & Evidence Grounding
 
-The marketplace enforces strict engineering hygiene to avoid hallucinated or generic findings:
+The marketplace enforces strict engineering hygiene to ensure defensible, evidence-grounded findings:
 
-1. **Zero Evidence Hallucination**: Every finding must supply non-empty, concrete evidence citing exact element counts, tag names, attribute values, or HTTP status codes. Findings lacking observable proof are strictly rejected by the validation guard.
+1. **Evidence Validation to Prevent Unsupported Findings**: Every finding must supply non-empty, concrete evidence citing exact element counts, tag names, attribute values, or HTTP status codes. Findings lacking observable proof are strictly rejected by the validation guard.
 2. **Defensible Severity Criteria**:
    - `critical`: Genuine blockers causing total interaction or discovery failure (e.g. universal crawler disallow, HTTP 403 on root, total loss of brand context on deep entry).
    - `high`: Materially harmful defects (e.g. AI-specific crawler blocks, client-side rendering dependency with empty body, missing conversion CTAs on product pages).
@@ -227,7 +227,7 @@ The marketplace enforces strict engineering hygiene to avoid hallucinated or gen
 
 ## 7. Operational Safety & Boundaries
 
-- **100% Read-Only & Passive**: Audits issue standard HTTP `GET` and `HEAD` requests. The system never executes mutating operations, submits forms, or modifies target websites.
+- **Read-Only by Design & Passive**: Audits issue standard HTTP `GET` and `HEAD` requests. The system never executes mutating operations, submits forms, or modifies target websites.
 - **Robots-Aware & Bounded**: Crawling strictly respects `robots.txt` directives, enforces a maximum page crawl budget (default 5 pages), and enforces bounded timeouts (default 10s).
 - **Graceful Failure & Resilience**: If an individual audit module encounters network failure or an unhandled parsing exception, findings from the healthy module are preserved, and explicit limitations are appended to the report.
 - **Provider Neutrality**: Evaluates standard, open web protocols (HTML5 semantic tags, Schema.org, OpenGraph, W3C WAI-ARIA) rather than proprietary platform heuristics.
@@ -328,10 +328,11 @@ AI-Readiness-Agent-Marketplace/
 
 ---
 
-## 11. Technical References & Schemas
-
+## 11. Technical References & Deep Documentation
+ 
 - [Architecture & Technical Design](docs/architecture.md)
 - [Audit Methodology & Scoring Framework](docs/methodology.md)
+- [Integration Checklist & Verification](docs/integration-checklist.md)
 - [Audit Orchestrator Skill Specification](skills/audit-orchestrator/SKILL.md)
 - [AI Discoverability Skill Specification](skills/ai-discoverability/SKILL.md)
 - [On-Site Engagement Skill Specification](skills/engagement-audit/SKILL.md)
