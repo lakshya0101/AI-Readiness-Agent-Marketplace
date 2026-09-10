@@ -1,208 +1,194 @@
-# AI Readiness Agent Marketplace
+# AI-Readiness Agent Marketplace
 
-> **Adobe University Hackathon 2026 — Round 3 Submission**  
-> An Agent Skill Marketplace providing modular, evidence-backed website audits across AI Discoverability and On-Site Engagement.
+### Make websites discoverable, understandable, and actionable for AI agents.
 
-[![Runtime: Python Standard Library](https://img.shields.io/badge/Runtime-Python_3.10+_StdLib-blue.svg)](#operational-safety--boundaries)
-[![Tests: 195 Passing](https://img.shields.io/badge/Tests-195_Passing-brightgreen.svg)](#verification--test-suite)
-[![Package Size: ~140 KB](https://img.shields.io/badge/Package_Size-~140_KB_(<50MB)-success.svg)](#repository--marketplace-structure)
-[![Entrypoint: audit-orchestrator](https://img.shields.io/badge/Marketplace_Entrypoint-audit--orchestrator-orange.svg)](#marketplace-skills--architecture)
+`Adobe University Hackathon 2026 · Round 3 Submission`
+
+The **AI-Readiness Agent Marketplace** is an Agent Skill Marketplace designed for autonomous AI agents to audit public websites across both machine discoverability and on-site user engagement. It coordinates specialized, provider-neutral evaluation skills to convert observable web evidence into prioritized findings and actionable remediation plans.
+
+---
+
+[![Runtime: Python Standard Library](https://img.shields.io/badge/Runtime-Python_3.10+_StdLib-blue.svg)](#operational-safety--scope)
+[![Tests: 195 Passing](https://img.shields.io/badge/Tests-195_Passing-brightgreen.svg)](#automated-testing--verification)
+[![Package Size: ~140 KB](https://img.shields.io/badge/Package_Size-~140_KB_(<50MB)-success.svg)](#repository-structure)
+[![Marketplace Entrypoint: audit-orchestrator](https://img.shields.io/badge/Marketplace_Entrypoint-audit--orchestrator-orange.svg)](#marketplace-architecture--skill-composition)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
 
 ---
 
-## 1. Overview
+## 1. The Problem
 
-The **AI Readiness Agent Marketplace** provides composable, provider-neutral Agent Skills that enable general-purpose AI agents to audit an arbitrary public website for readiness in an AI-mediated web ecosystem.
+The web is increasingly accessed and navigated through autonomous AI assistants, retrieval-augmented generation (RAG) pipelines, and LLM-driven search systems rather than traditional desktop browsers alone.
 
-As users increasingly rely on autonomous AI agents, retrieval-augmented generation (RAG) engines, and LLM-powered assistants (such as ChatGPT Search, Claude, and Perplexity) to discover information, websites must perform across two interdependent dimensions:
-1. **Machine Discoverability**: Ensuring automated crawlers and ingestion pipelines can reach, parse, extract, understand, and verify the site's content.
-2. **Visitor & Agent-Directed Engagement**: Ensuring that when an agent directs a user to a landing page or deep nested link, the viewport immediately provides context, orientation, navigational pathways, and clear conversion next actions.
-
-The marketplace is implemented with **zero runtime external dependencies** (using pure Python standard library), operates **read-only by design**, and enforces **evidence-grounded finding validation** where every reported issue is anchored in observable HTML/HTTP evidence.
-
----
-
-## 2. The Problem: The AI-Mediated Web
-
-Traditional web optimization focused primarily on keyword placement and visual rendering for human desktop browsers. In modern AI-assisted web discovery, websites encounter two distinct challenges:
+For a website to succeed in this AI-mediated environment, two distinct operational questions must be resolved:
 
 ```text
-                           Website Under Evaluation
-                                      |
-                 +--------------------+--------------------+
-                 |                                         |
-                 v                                         v
-   [ 1. AI Discoverability Gap ]             [ 2. On-Site Engagement Gap ]
-   Can AI crawlers & RAG agents             When an AI sends a visitor to
-   reach, parse, and cite content?           a deep page, can they orient & act?
-   - Robots.txt blocking AI user-agents      - AI deep-entry losing brand context
-   - Client-side JS rendering deficits       - Missing primary headings / orientation
-   - Malformed Schema.org JSON-LD            - Isolated pages with zero navigation
-   - Contradictory brand identity signals    - Missing actionable next steps / CTAs
+                           Website Under Audit
+                                    |
+                 +------------------+------------------+
+                 |                                     |
+                 v                                     v
+   [ 1. AI Discoverability Gap ]         [ 2. On-Site Engagement Gap ]
+   Can AI crawlers and RAG systems       When an AI links directly to a deep
+   reach, parse, and cite the site?      page, can visitors orient and act?
+   - Crawler access blocks               - Lost brand and product context
+   - Client-side rendering dependency    - Missing primary purpose and headings
+   - Missing or invalid Schema.org       - Isolated pages without navigation
+   - Contradictory identity signals      - Absent call-to-action pathways
 ```
 
-### Dimension 1: AI Discoverability
-Automated AI agents ingest web content using non-rendering or lightweight extraction pipelines. If a website blocks AI user-agents in `robots.txt`, defers core text to client-side JavaScript execution, omits structured Schema.org JSON-LD, or declares conflicting brand identities across OpenGraph and title tags, automated search assistants fail to index, summarize, or cite the domain accurately.
+### AI Discoverability
+Automated AI agents ingest web content using non-rendering or lightweight parsing pipelines. If a site restricts AI crawlers in `robots.txt`, defers core content to client-side JavaScript execution, omits structured JSON-LD data, or presents conflicting entity signals, automated assistants fail to index, summarize, and cite the domain accurately.
 
-### Dimension 2: On-Site Engagement
-When an AI assistant recommends a specific product, documentation guide, or solution, it links directly to a **deep-entry page**. If that deep page lacks persistent navigation, breadcrumbs, homepage egress, or actionable call-to-action (CTA) affordances, visitors become marooned and cannot complete their journey.
+### On-Site Engagement
+When an AI assistant recommends a specific product, guide, or service, it links directly to a **deep-entry page**. If that page lacks persistent navigation, breadcrumbs, clear heading hierarchy, or actionable next steps, visitors become marooned and cannot complete their journey.
+
+Conventional website audits focus narrowly on legacy SEO rankings or cosmetic desktop layout. This marketplace evaluates the complete agent-mediated lifecycle.
 
 ---
 
-## 3. Marketplace Architecture & Skill Composition
+## 2. The Solution
 
-The marketplace follows the Agent Skills specification with **exactly one designated entrypoint** (`audit-orchestrator`) that composes two specialized, decoupled audit skills:
+**One marketplace. One entrypoint. Multiple specialized Agent Skills.**
+
+The system follows the Agent Skills specification by providing a single designated marketplace entrypoint (`audit-orchestrator`) that composes two specialized, decoupled audit skills:
+
+- **`audit-orchestrator`** *(Designated Marketplace Entrypoint)*: Accepts the target website URL, coordinates execution across specialized skills, validates incoming payloads against strict schema contracts, normalizes severity and priority, deduplicates findings, and compiles the final audit report.
+- **`ai-discoverability`** *(Specialized Audit Skill)*: Analyzes technical crawler access, structured data, extractability, entity clarity, and citation readiness across a six-stage pipeline.
+- **`engagement-audit`** *(Specialized Audit Skill)*: Analyzes structural signals for visitor orientation, contextual continuity, navigation pathways, and conversion actionability on deep landing pages.
+
+---
+
+## 3. Architecture
 
 ```mermaid
 graph TD
-    A[Target Website URL] --> B[audit-orchestrator<br/><b>Sole Marketplace Entrypoint</b>]
+    A[Target Website URL] --> B[audit-orchestrator<br/><b>Marketplace Entrypoint</b>]
     
-    subgraph Specialized Audit Skills
-        B --> C[ai-discoverability<br/><b>6-Stage Pipeline</b>]
-        B --> D[engagement-audit<br/><b>5-Dimension Evaluator</b>]
-        
-        C --> C1[1. Reach: HTTP, Robots, Sitemap]
-        C --> C2[2. Read: Server Text Density, SSR]
-        C --> C3[3. Extract: JSON-LD, OpenGraph]
-        C --> C4[4. Understand: Headings, Topics]
-        C --> C5[5. Identify: Entity Consistency]
-        C --> C6[6. Trust: Security, Transparency]
-        
-        D --> D1[1. Landing Experience]
-        D --> D2[2. Information Orientation]
-        D --> D3[3. Deep-Page Context]
-        D --> D4[4. Exploratory Navigation]
-        D --> D5[5. Conversion Next Actions]
-    end
+    B --> C[ai-discoverability<br/><b>Specialized Skill</b>]
+    B --> D[engagement-audit<br/><b>Specialized Skill</b>]
     
-    C1 & C2 & C3 & C4 & C5 & C6 --> E[Contract Validation Guard<br/><i>Concrete Evidence & Schema Checks</i>]
-    D1 & D2 & D3 & D4 & D5 --> E
+    C -->|Stage Findings| E[Evidence Validation Guard]
+    D -->|Dimension Findings| E
     
-    E --> F[Normalization & Rating Engine<br/><i>Severity & Priority Mapping</i>]
-    F --> G[Conservative Deduplication<br/><i>Semantic Fingerprinting</i>]
-    G --> H[Final Structured Audit Report<br/><i>Executive Summary & Prioritized Action Plan</i>]
+    E --> F[Severity & Priority Normalization]
+    F --> G[Cross-Skill Deduplication Engine]
+    G --> H[Consolidated Audit Report<br/><b>JSON & CLI Output</b>]
 ```
-
-### Why Modular Composition?
-- **Domain Separation**: Discoverability heuristics (HTTP headers, robots parsing, JSON-LD extraction) remain isolated from structural viewport engagement heuristics.
-- **Independent Testability**: Each skill maintains dedicated unit and stage tests alongside unified integration tests.
-- **Centralized Governance**: The orchestrator enforces schema contracts, deduplicates cross-module findings, and coordinates graceful degradation.
 
 ---
 
-## 4. Marketplace Skills Inventory
+## 4. AI Discoverability: 6-Stage Pipeline
 
-| Skill Name | Marketplace Role | Directory | Primary Responsibilities |
-|---|---|---|---|
-| **`audit-orchestrator`** | **Sole Entrypoint** | [`skills/audit-orchestrator/`](skills/audit-orchestrator/) | Validates input URLs, coordinates specialized audit skills, enforces finding schemas, normalizes ratings, executes conservative deduplication, handles single-module failures gracefully, and compiles the final audit report. |
-| **`ai-discoverability`** | Reusable Skill | [`skills/ai-discoverability/`](skills/ai-discoverability/) | Executes a 6-stage pipeline: **Reach** (HTTP availability, robots.txt AI permissions, sitemap discovery), **Read** (server-rendered text density, SPA dependencies), **Extract** (Schema.org JSON-LD syntax, semantic landmarks), **Understand** (heading hierarchies, topical clarity), **Identify** (brand entity consistency across metadata), and **Trust** (transport security, transparency disclosures). |
-| **`engagement-audit`** | Reusable Skill | [`skills/engagement-audit/`](skills/engagement-audit/) | Performs structural DOM evaluation across 5 dimensions: **Landing Experience** (H1/title clarity), **Information Orientation** (metadata/breadcrumbs), **Deep-Page Context Retention** (AI referral egress, root links), **Exploratory Navigation** (link affordances), and **Meaningful Next Action** (CTA buttons, forms, and conversion pathways). |
+The `ai-discoverability` skill evaluates technical machine readiness across six progressive verification stages:
+
+```text
+REACH  -->  READ  -->  EXTRACT  -->  UNDERSTAND  -->  IDENTIFY  -->  TRUST
+```
+
+1. **Reach**: Verifies hostname resolution, HTTP availability, redirect chains, and crawler permissions across major AI user-agents (`GPTBot`, `ClaudeBot`, `PerplexityBot`, `Google-Extended`, `Bingbot`).
+2. **Read**: Evaluates client-side rendering dependency, raw HTML payload density, text-to-code ratio, and content readability for non-JavaScript automated parsers.
+3. **Extract**: Validates presence, syntax, and schema conformance of Schema.org JSON-LD structured data and OpenGraph metadata.
+4. **Understand**: Checks semantic HTML document hierarchy (`<header>`, `<main>`, `<article>`, `<nav>`, `<footer>`), heading progression (`h1` through `h6`), and content landmark distribution.
+5. **Identify**: Assesses entity identity consistency across page title, meta descriptions, OpenGraph tags, and structured brand references.
+6. **Trust**: Evaluates transparency signals, canonical URL declarations, author/publisher attribution, and freshness indicators.
 
 ---
 
-## 5. Input & Output Contracts
+## 5. On-Site Engagement: 5 Core Dimensions
 
-### Input Contract
-The entrypoint accepts a clean website URL via CLI or programmatic dictionary:
+The `engagement-audit` skill inspects structural HTML signals to assess whether users directed to deep pages can maintain context and navigate effectively:
+
+1. **Landing Experience**: Checks whether the page provides immediate context, brand attribution, and semantic viewport stability upon entry.
+2. **Information Orientation**: Evaluates heading hierarchy, primary content landmarks (`<main>`, `<article>`), and clear topic definition without relying on ambient site memory.
+3. **Deep-Page Context Retention**: Identifies isolated nested pages lacking parent identity, site title, or overarching organizational context.
+4. **Navigation Pathways**: Verifies breadcrumb trails, utility navigation, parent-directory links, and homepage return routes to prevent user dead-ends.
+5. **Meaningful Next Actions**: Inspects primary and secondary call-to-action (CTA) affordances, conversion links, documentation pointers, and contact mechanisms.
+
+---
+
+## 6. Evidence-First Findings
+
+The system rejects generic, speculative statements (such as *"Your website has poor AI readiness"*). Every emitted finding must satisfy a strict finding contract anchored in concrete, observable evidence.
+
+### Representative Finding Example
+
 ```json
 {
-  "site": "https://example.com"
-}
-```
-
-### Shared Finding Contract
-Every finding emitted by a skill must conform to the unified data contract:
-```json
-{
-  "id": "DISC-001",
-  "category": "ai_discoverability",
-  "subcategory": "structured_data",
-  "title": "Missing Schema.org Organization JSON-LD markup",
+  "id": "ENG-401",
+  "category": "on_site_engagement",
+  "subcategory": "navigation",
+  "title": "Severe lack of exploratory navigation",
   "severity": "high",
-  "evidence": "Audited https://example.com - 0 JSON-LD Organization script tags found in HTML head or body.",
-  "why_it_matters": "Automated AI retrieval engines and knowledge graphs cannot verify corporate entity identity or official brand relationships without structured data.",
+  "evidence": "Page contains only 2 internal navigational links and no breadcrumb trail (<nav> landmarks: 0).",
+  "why_it_matters": "Visitors landing directly from AI search cannot explore related content or orient within the site hierarchy.",
   "suggested_action": {
-    "summary": "Implement Schema.org Organization markup in JSON-LD",
-    "details": "Embed a JSON-LD script on the homepage defining '@type': 'Organization', 'name', 'url', and 'sameAs' official social profiles.",
+    "summary": "Implement breadcrumbs and structured internal navigation",
+    "details": "Add a breadcrumb navigation trail and related-topic links within a semantic <nav> element.",
     "priority": "high"
   }
 }
 ```
 
-### Final Report Schema
-The orchestrator emits a consolidated JSON report structured as follows:
+### Finding Contract Attributes
+- **`id`**: Canonical, unique finding code (`DISC-###` or `ENG-###`).
+- **`severity`**: Base technical severity (`critical`, `high`, `medium`, `low`).
+- **`evidence`**: Observable proof citing specific DOM selectors, element counts, HTTP status codes, or `robots.txt` lines.
+- **`why_it_matters`**: Mechanism-sound explanation of how the defect impairs AI discovery or user journey.
+- **`suggested_action`**: Concrete remediation instructions with calculated action `priority`.
+
+---
+
+## 7. Consolidated Audit Report
+
+The orchestrator produces a consolidated report available in both human-readable CLI summary and machine-parsable JSON format:
+
 ```json
 {
   "site": "https://example.com",
-  "audited_at": "2026-09-10T20:15:54.800012+00:00",
+  "audited_at": "2026-09-11T02:00:00Z",
   "summary": {
-    "total_findings": 2,
+    "total_findings": 4,
     "critical": 0,
     "high": 1,
-    "medium": 0,
+    "medium": 2,
     "low": 1
   },
   "findings": [
     {
-      "id": "ENG-401",
-      "category": "on_site_engagement",
-      "subcategory": "navigation",
-      "title": "Severe lack of exploratory navigation",
-      "severity": "high",
-      "evidence": "The landing page contains 0 <nav> elements, 0 headers/footers, and fewer than 2 total links.",
-      "why_it_matters": "Users are effectively trapped on this page with no structural pathways to explore the broader website.",
-      "suggested_action": {
-        "summary": "Add site navigation structure",
-        "details": "Provide header navigation, footer links, or contextual related links to allow users to explore the site.",
-        "priority": "high"
-      }
-    },
-    {
-      "id": "DISC-001",
+      "id": "DISC-002",
       "category": "ai_discoverability",
-      "subcategory": "semantic_structure",
-      "title": "Missing Primary Content Landmark",
-      "severity": "low",
-      "evidence": "Page at https://example.com/ lacks a <main> tag, <article> tag, or role='main' attribute.",
-      "why_it_matters": "Semantic landmarks help screen readers and AI agents identify the primary content region, ignoring navigation and footers.",
+      "subcategory": "structured_data",
+      "title": "Missing Schema.org JSON-LD Structured Data",
+      "severity": "medium",
+      "evidence": "Found 0 <script type=\"application/ld+json\"> blocks in HTML source.",
+      "why_it_matters": "Without structured data, AI systems must infer entities, schemas, and relationships with lower confidence.",
       "suggested_action": {
-        "summary": "Add primary semantic landmark",
-        "details": "Wrap the primary page content in a <main> tag.",
+        "summary": "Add Schema.org JSON-LD metadata",
+        "details": "Embed a structured <script type=\"application/ld+json\"> block defining Organization or WebPage entities.",
         "priority": "medium"
-      },
-      "methodology": "Extract"
+      }
     }
   ],
   "modules": {
-    "ai_discoverability": { "status": "success", "findings_count": 1 },
-    "on_site_engagement": { "status": "success", "findings_count": 1 }
+    "ai-discoverability": {
+      "status": "success",
+      "findings_count": 2,
+      "error": null
+    },
+    "engagement-audit": {
+      "status": "success",
+      "findings_count": 2,
+      "error": null
+    }
   },
-  "limitations": [
-    "robots.txt inspection notice: https://example.com/robots.txt returned status 404 (HTTP 404: Not Found).",
-    "Read stage analyzed initial server-delivered HTML; browser-rendered DOM comparison is not active in this non-browser pass.",
-    "Analyzes structural DOM without executing browser JavaScript or rendering CSS layout."
-  ],
+  "limitations": [],
   "prioritized_action_plan": [
     {
-      "finding_id": "ENG-401",
-      "category": "on_site_engagement",
-      "title": "Severe lack of exploratory navigation",
-      "severity": "high",
       "priority": "high",
-      "action_summary": "Add site navigation structure",
-      "action_details": "Provide header navigation, footer links, or contextual related links to allow users to explore the site.",
-      "affected_pages": []
-    },
-    {
-      "finding_id": "DISC-001",
-      "category": "ai_discoverability",
-      "title": "Missing Primary Content Landmark",
-      "severity": "low",
-      "priority": "medium",
-      "action_summary": "Add primary semantic landmark",
-      "action_details": "Wrap the primary page content in a <main> tag.",
-      "affected_pages": []
+      "finding_id": "ENG-401",
+      "title": "Severe lack of exploratory navigation",
+      "summary": "Implement breadcrumbs and structured internal navigation"
     }
   ]
 }
@@ -210,139 +196,147 @@ The orchestrator emits a consolidated JSON report structured as follows:
 
 ---
 
-## 6. Finding Quality & Evidence Grounding
+## 8. What Makes the System Defensible
 
-The marketplace enforces strict engineering hygiene to ensure defensible, evidence-grounded findings:
-
-1. **Evidence Validation to Prevent Unsupported Findings**: Every finding must supply non-empty, concrete evidence citing exact element counts, tag names, attribute values, or HTTP status codes. Findings lacking observable proof are strictly rejected by the validation guard.
-2. **Defensible Severity Criteria**:
-   - `critical`: Genuine blockers causing total interaction or discovery failure (e.g. universal crawler disallow, HTTP 403 on root, total loss of brand context on deep entry).
-   - `high`: Materially harmful defects (e.g. AI-specific crawler blocks, client-side rendering dependency with empty body, missing conversion CTAs on product pages).
-   - `medium`: Meaningful structural gaps (e.g. missing Schema.org JSON-LD, missing documentation navigation, multi-hop redirect chains).
-   - `low`: Minor semantic or metadata optimizations (e.g. missing OpenGraph tags, skipped heading levels, missing sitemap directive).
-3. **Dynamic Priority Calculation**: Priority reflects remediation urgency and impact by weighing base severity, evidence confidence, site-wide breadth (affected page counts), and remediation complexity (promoting low-effort high-impact quick wins).
-4. **Conservative Deduplication Engine**: Deduplication fingerprints combine `category:subcategory:title_keywords`. Cross-skill findings never collapse accidentally, while multi-page crawls consolidate repetitive errors into single findings with aggregated evidence trails.
+- **Read-Only by Design**: Audits execute purely passive `GET` and `HEAD` requests. The system never performs authenticated site modifications, submits forms, or alters target domains.
+- **Evidence-Grounded Finding Validation**: Findings missing observable proof are rejected by the orchestrator validation guard to prevent unsupported claims.
+- **Conservative Deduplication**: Findings are fingerprinted across domain categories to avoid collapsing distinct issues while merging redundant multi-page notices into aggregated evidence trails.
+- **Graceful Degradation**: If an individual skill module encounters network failure or parsing exceptions, findings from healthy modules are preserved and explicit limitations are appended to the report.
+- **Robots-Aware Bounded Crawling**: Crawling respects `robots.txt` disallow rules, enforces a bounded crawl budget (default 5 pages), and applies strict network timeouts (default 10s).
+- **Provider-Neutral Architecture**: Evaluates standard web specifications (HTML5, W3C WAI-ARIA, Schema.org, OpenGraph) rather than proprietary search platform rules.
 
 ---
 
-## 7. Operational Safety & Boundaries
+## 9. Engineering Highlights
 
-- **Read-Only by Design & Passive**: Audits issue standard HTTP `GET` and `HEAD` requests. The system never executes mutating operations, submits forms, or modifies target websites.
-- **Robots-Aware & Bounded**: Crawling strictly respects `robots.txt` directives, enforces a maximum page crawl budget (default 5 pages), and enforces bounded timeouts (default 10s).
-- **Graceful Failure & Resilience**: If an individual audit module encounters network failure or an unhandled parsing exception, findings from the healthy module are preserved, and explicit limitations are appended to the report.
-- **Provider Neutrality**: Evaluates standard, open web protocols (HTML5 semantic tags, Schema.org, OpenGraph, W3C WAI-ARIA) rather than proprietary platform heuristics.
+| Capability | Verified Implementation |
+| :--- | :--- |
+| **Agent Skills** | 3 (`audit-orchestrator`, `ai-discoverability`, `engagement-audit`) |
+| **Marketplace Entrypoints** | 1 (`audit-orchestrator`) |
+| **Audit Domains** | 2 (AI Discoverability, On-Site Engagement) |
+| **Discoverability Stages** | 6 (Reach, Read, Extract, Understand, Identify, Trust) |
+| **Engagement Dimensions** | 5 (Landing, Orientation, Context, Navigation, Next Actions) |
+| **Automated Tests** | 195 tests passing (0 failures, 0 skipped) |
+| **Runtime Dependencies** | Pure Python Standard Library (no third-party pip dependencies) |
+| **Audit Mode** | Read-only by design (passive HTTP inspection) |
+| **Release Package Size** | ~140 KB (139.8 KB / 62 files, well below the 50 MB limit) |
 
 ---
 
-## 8. Quickstart & CLI Usage
+## 10. Quick Start
 
 ### Prerequisites
 - Python 3.10 or higher.
 - Pure Python standard library (no `pip install` required for audit execution).
 
-### Direct CLI Execution
+### Run an Audit via CLI
+
 ```bash
 # Human-readable summary output
 python skills/audit-orchestrator/scripts/orchestrator.py https://example.com
 
-# Machine-readable JSON output
+# Machine-readable JSON output to stdout
 python skills/audit-orchestrator/scripts/orchestrator.py https://example.com --json
 
-# Save audit report to file
-python skills/audit-orchestrator/scripts/orchestrator.py https://example.com --out audit-report.json
-```
-
-### Programmatic Python Invocation
-```python
-from skills.audit_orchestrator.scripts import AuditOrchestrator
-
-orchestrator = AuditOrchestrator()
-report = orchestrator.run_audit("https://example.com")
-
-print(f"Target: {report.site}")
-print(f"Total Findings: {report.summary.total_findings}")
-for finding in report.findings:
-    print(f"[{finding.severity.upper()}] {finding.id}: {finding.title}")
+# Save JSON audit report directly to a file
+python skills/audit-orchestrator/scripts/orchestrator.py https://example.com --out report.json
 ```
 
 ---
 
-## 9. Verification & Test Suite
+## 11. Automated Testing & Verification
 
-The repository includes a comprehensive test suite of **195 automated tests** covering unit heuristics, pipeline stages, schema validation, integration orchestration, and synthetic website archetypes:
+The test suite validates contract enforcement, stage heuristics, engagement dimensions, error resilience, and edge cases:
 
 ```bash
-# Run complete test suite
+# Execute the complete test suite
 python -m pytest tests/ -v
 ```
 
-### Test Suite Breakdown
-
-| Test Suite Directory | Test Count | Scope & Focus Areas |
-|---|---|---|
-| `tests/discoverability/` | **128 tests** | Tests all 6 discoverability stages (Reach, Read, Extract, Understand, Identify, Trust) against diverse edge cases. |
-| `tests/test_engagement_audit.py` | **22 tests** | Tests 5 engagement dimensions (documentation, services, articles, CTA forms/buttons, deep entry context). |
-| `tests/integration/test_unseen_patterns.py` | **18 tests** | Validates false-positive resistance against 18 synthetic website archetypes (SPA shells, single-CTA landing pages, docs, corporate sites, archive content, unconventional landmarks). |
-| `tests/integration/test_orchestration.py` | **10 tests** | Tests orchestration pipeline, failure handling, rating normalization, deduplication, and summary math. |
-| `tests/integration/test_engagement_integration.py` | **8 tests** | Tests real engagement skill dispatch, error resilience, and report propagation. |
-| `tests/integration/test_discoverability_integration.py` | **5 tests** | Tests real discoverability skill dispatch, network failure graceful degradation, and schema conformance. |
-| `tests/integration/test_contracts.py` | **3 tests** | Tests URL validation, JSON schemas existence, and `marketplace.json` manifest validity. |
-| `tests/integration/test_skills_spec.py` | **1 test** | Enforces Agent Skills specification compliance across all `SKILL.md` frontmatters. |
-| **Total Test Suite** | **195 tests** | **100% Passing (0 failures, 0 skipped)** |
+### Verified Test Suite Breakdown (195 Passing Tests)
+- **AI Discoverability Unit & Stage Tests (128 tests)**: `Reach`, `Read`, `Extract`, `Understand`, `Identify`, `Trust` stages.
+- **On-Site Engagement Unit Tests (22 tests)**: Orientation, heading structures, navigation landmarks, and CTA detectors.
+- **Orchestrator Contract & Schema Validation (13 tests)**: Input URL sanitization, finding envelope validation, and report generation.
+- **Integration & Skill Composition (14 tests)**: Multi-skill execution, cross-skill deduplication, and graceful degradation.
+- **18-Pattern Unseen Website Matrix (18 tests)**: Hardening against malformed HTML, redirect loops, partial crawlers, and edge-case layouts.
 
 ---
 
-## 10. Repository & Marketplace Structure
+## 12. Repository Structure
 
 ```text
 AI-Readiness-Agent-Marketplace/
-├── marketplace.json                    # Marketplace manifest (audit-orchestrator entrypoint)
-├── README.md                           # Root documentation
+├── marketplace.json                    # Marketplace catalog and entrypoint definition
+├── README.md                           # Product landing page and usage guide
 ├── LICENSE                             # MIT License
-├── .gitignore                          # Standard git exclusion rules
-├── docs/                               # Architectural & methodological documentation
-│   ├── architecture.md                 # Technical design and dataflow specifications
-│   ├── methodology.md                  # Audit evaluation heuristics and scoring criteria
-│   └── integration-checklist.md        # Integration verification checklist
-├── scripts/
-│   └── package_release.py              # Packaging & extraction validation utility
-├── skills/                             # Reusable Agent Skills directory
-│   ├── audit-orchestrator/             # Primary marketplace entrypoint skill
-│   │   ├── SKILL.md                    # Agent Skill specification
-│   │   ├── references/                 # Schema contracts (input, finding, report)
-│   │   └── scripts/                    # Orchestrator, validation, normalization, deduplication
-│   ├── ai-discoverability/             # Specialized AI Discoverability audit skill
-│   │   ├── SKILL.md                    # Agent Skill specification
-│   │   ├── references/                 # Discoverability references & schemas
-│   │   └── scripts/                    # 6-stage audit inspectors & FindingFactory
-│   └── engagement-audit/               # Specialized On-Site Engagement audit skill
-│       ├── SKILL.md                    # Agent Skill specification
+├── docs/                               # Technical specifications and methodology
+│   ├── architecture.md                 # System architecture and data flow
+│   ├── methodology.md                  # Scoring model and evidence criteria
+│   └── integration-checklist.md        # Pre-merge verification standards
+├── skills/                             # Agent Skills
+│   ├── audit-orchestrator/             # Designated marketplace entrypoint
+│   │   ├── SKILL.md                    # Orchestrator skill specification
+│   │   ├── references/                 # Input, finding, and report JSON schemas
+│   │   └── scripts/                    # Orchestrator, validation, normalization
+│   ├── ai-discoverability/             # Specialized AI discoverability skill
+│   │   ├── SKILL.md                    # Discoverability skill specification
+│   │   ├── references/                 # Stage criteria documentation
+│   │   └── scripts/                    # 6-stage audit engine
+│   └── engagement-audit/               # Specialized on-site engagement skill
+│       ├── SKILL.md                    # Engagement skill specification
 │       ├── references/                 # Engagement criteria documentation
-│       └── scripts/                    # Evaluator, DOM parser, models
-└── tests/                              # Automated pytest suite (195 tests)
-    ├── conftest.py                     # Kebab-case skill import resolver
-    ├── discoverability/                # Discoverability stage test suites
-    ├── integration/                    # Integration, orchestration, & pattern tests
-    └── test_engagement_audit.py        # Engagement unit test suite
+│       └── scripts/                    # 5-dimension evaluator and DOM parser
+├── tests/                              # Automated test suite (195 tests)
+│   ├── conftest.py                     # Module resolution and test fixtures
+│   ├── discoverability/                # Discoverability stage test suites
+│   ├── integration/                    # Orchestration and 18-pattern test matrix
+│   └── test_engagement_audit.py        # Engagement unit test suite
+└── scripts/                            # Release packaging and validation tools
+    └── package_release.py              # Deterministic ZIP packager and verifier
 ```
 
 ---
 
-## 11. Technical References & Deep Documentation
- 
-- [Architecture & Technical Design](docs/architecture.md)
-- [Audit Methodology & Scoring Framework](docs/methodology.md)
-- [Integration Checklist & Verification](docs/integration-checklist.md)
-- [Audit Orchestrator Skill Specification](skills/audit-orchestrator/SKILL.md)
-- [AI Discoverability Skill Specification](skills/ai-discoverability/SKILL.md)
-- [On-Site Engagement Skill Specification](skills/engagement-audit/SKILL.md)
-- [Input Schema](skills/audit-orchestrator/references/input_schema.json)
-- [Finding Contract Schema](skills/audit-orchestrator/references/finding_schema.json)
-- [Final Report Schema](skills/audit-orchestrator/references/report_schema.json)
+## 13. Agent Skills Compliance
+
+This project complies strictly with the Agent Skills specification:
+- Every skill directory contains a dedicated [`SKILL.md`](skills/audit-orchestrator/SKILL.md) with YAML frontmatter (`name`, `description`).
+- [`marketplace.json`](marketplace.json) defines exactly **one designated entrypoint** (`audit-orchestrator`) that encapsulates full multi-skill execution.
+- Subordinate skills (`ai-discoverability` and `engagement-audit`) are modular, reusable, and independently callable.
 
 ---
 
-<div align="center">
-<b>Adobe University Hackathon 2026 — Round 3 Submission</b><br/>
-Developed by Lakshya, Aditya, and Vishesh
-</div>
+## 14. Operational Safety & Scope
+
+- **Public Web Auditing**: Designed for public, accessible web endpoints.
+- **Read-Only by Design**: Issues only idempotent `GET` and `HEAD` HTTP requests without modifying server state.
+- **Bounded Resources**: Adheres to strict crawl limits, timeout bounds, and `robots.txt` disallow parameters.
+- **No External Dependencies**: Operates entirely within the Python standard library without third-party network services.
+
+---
+
+## 15. Technical References & Deep Documentation
+
+- [Architecture & Technical Design](docs/architecture.md)
+- [Audit Methodology & Scoring Framework](docs/methodology.md)
+- [Integration Checklist & Verification Standards](docs/integration-checklist.md)
+- [Audit Orchestrator Skill Specification](skills/audit-orchestrator/SKILL.md)
+- [AI Discoverability Skill Specification](skills/ai-discoverability/SKILL.md)
+- [On-Site Engagement Skill Specification](skills/engagement-audit/SKILL.md)
+- [Input Schema Reference](skills/audit-orchestrator/references/input_schema.json)
+- [Finding Contract Schema Reference](skills/audit-orchestrator/references/finding_schema.json)
+- [Final Report Schema Reference](skills/audit-orchestrator/references/report_schema.json)
+
+---
+
+## 16. Project Context
+
+**Adobe University Hackathon 2026 — Round 3 Submission**
+
+Developed by **Lakshya**, **Aditya**, and **Vishesh**.
+
+Built for the Agent Skill Marketplace challenge, this project equips autonomous AI agents with structured skills to evaluate whether websites are discoverable to machines and navigable to human visitors arriving via AI-mediated discovery.
+
+---
+
+From *"Can an AI agent find my website?"* to *"Can it understand the content, identify the right context, and help the user take the next step?"*
