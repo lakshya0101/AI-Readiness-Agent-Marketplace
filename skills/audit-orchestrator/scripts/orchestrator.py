@@ -39,6 +39,39 @@ except ImportError:
         validate_module_payload,
     )
 
+def _get_discoverability_runner(options: Optional[Dict[str, Any]] = None) -> Callable[[str], Dict[str, Any]]:
+    try:
+        from skills.ai_discoverability.scripts import audit_discoverability as disc_fn
+        return lambda site: disc_fn(site, options=options)
+    except ImportError:
+        try:
+            from skills_ai_discoverability import audit_discoverability as disc_fn  # type: ignore
+            return lambda site: disc_fn(site, options=options)
+        except ImportError:
+            # Fallback to direct file location resolution for standalone CLI execution
+            try:
+                import importlib.util
+                from pathlib import Path
+                repo_root = Path(__file__).resolve().parents[3]
+                disc_scripts_dir = repo_root / "skills" / "ai-discoverability" / "scripts"
+                disc_init = disc_scripts_dir / "__init__.py"
+                if disc_init.exists():
+                    spec = importlib.util.spec_from_file_location(
+                        "skills_ai_discoverability",
+                        str(disc_init),
+                        submodule_search_locations=[str(disc_scripts_dir)],
+                    )
+                    if spec and spec.loader:
+                        mod = importlib.util.module_from_spec(spec)
+                        sys.modules["skills_ai_discoverability"] = mod
+                        spec.loader.exec_module(mod)
+                        disc_fn = getattr(mod, "audit_discoverability", None)
+                        if disc_fn:
+                            return lambda site: disc_fn(site, options=options)
+            except Exception:
+                pass
+            return get_mock_discoverability_success
+
 
 class AuditOrchestrator:
     """
@@ -50,9 +83,14 @@ class AuditOrchestrator:
         self,
         discoverability_runner: Optional[Callable[[str], Dict[str, Any]]] = None,
         engagement_runner: Optional[Callable[[str], Dict[str, Any]]] = None,
+        discoverability_options: Optional[Dict[str, Any]] = None,
     ):
-        # Default to mock runners if actual skills are still under branch development
-        self.discoverability_runner = discoverability_runner or get_mock_discoverability_success
+        self.discoverability_options = discoverability_options
+        if discoverability_runner is not None:
+            self.discoverability_runner = discoverability_runner
+        else:
+            self.discoverability_runner = _get_discoverability_runner(options=self.discoverability_options)
+
         self.engagement_runner = engagement_runner or get_mock_engagement_success
 
     def run_audit(self, site_input: str) -> AuditReport:
@@ -75,6 +113,12 @@ class AuditOrchestrator:
             disc_findings, disc_rejections, disc_err = validate_module_payload(
                 disc_payload, expected_skill="ai-discoverability"
             )
+
+            # Preserve explicit limitations reported by the skill
+            if isinstance(disc_payload, dict) and isinstance(disc_payload.get("limitations"), list):
+                for lim in disc_payload["limitations"]:
+                    if isinstance(lim, str) and lim.strip() and lim.strip() not in limitations:
+                        limitations.append(lim.strip())
 
             if disc_err:
                 module_statuses["ai_discoverability"] = {
