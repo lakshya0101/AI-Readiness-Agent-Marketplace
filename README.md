@@ -69,8 +69,8 @@ The marketplace operates through a single designated entrypoint: the **`audit-or
 | Skill | Directory | Owner | Branch | Status | Description |
 |---|---|---|---|---|---|
 | **`audit-orchestrator`** *(Entrypoint)* | `skills/audit-orchestrator/` | **Lakshya** | `feature/lakshya-orchestrator` | **Complete / Ready** | Coordinates specialized skills, enforces finding contracts, deduplicates issues, normalizes severities/priorities, handles failures gracefully, and compiles final audit reports. |
-| **`ai-discoverability`** | `skills/ai-discoverability/` | **Aditya** | `feature/aditya-discoverability` | *In Progress* | Audits technical crawlability, robots.txt AI rules, structured data (Schema.org JSON-LD), extractability, entity clarity, and brand trust signals. |
-| **`engagement-audit`** | `skills/engagement-audit/` | **Vishesh** | `feature/vishesh-engagement` | *In Progress* | Audits landing viewport hierarchy, above-the-fold value clarity, cognitive load, navigation affordances, and Call-to-Action (CTA) contrast/friction. |
+| **`ai-discoverability`** | `skills/ai-discoverability/` | **Aditya** | `feature/aditya-discoverability` | **Integrated / Complete** | Audits technical crawlability, robots.txt AI rules, structured data (Schema.org JSON-LD), extractability, entity clarity, and brand trust signals. |
+| **`engagement-audit`** | `skills/engagement-audit/` | **Vishesh** | `feature/vishesh-engagement` | **Integrated / Complete** | Audits landing viewport hierarchy, above-the-fold value clarity, cognitive load, navigation affordances, and Call-to-Action (CTA) contrast/friction. |
 
 ---
 
