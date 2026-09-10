@@ -73,6 +73,40 @@ def _get_discoverability_runner(options: Optional[Dict[str, Any]] = None) -> Cal
             return get_mock_discoverability_success
 
 
+def _get_engagement_runner(options: Optional[Dict[str, Any]] = None) -> Callable[[str], Dict[str, Any]]:
+    try:
+        from skills.engagement_audit.scripts import audit_engagement as eng_fn
+        return lambda site: eng_fn(site, options=options)
+    except ImportError:
+        try:
+            from skills_engagement_audit import audit_engagement as eng_fn  # type: ignore
+            return lambda site: eng_fn(site, options=options)
+        except ImportError:
+            # Fallback to direct file location resolution for standalone CLI execution
+            try:
+                import importlib.util
+                from pathlib import Path
+                repo_root = Path(__file__).resolve().parents[3]
+                eng_scripts_dir = repo_root / "skills" / "engagement-audit" / "scripts"
+                eng_init = eng_scripts_dir / "__init__.py"
+                if eng_init.exists():
+                    spec = importlib.util.spec_from_file_location(
+                        "skills_engagement_audit",
+                        str(eng_init),
+                        submodule_search_locations=[str(eng_scripts_dir)],
+                    )
+                    if spec and spec.loader:
+                        mod = importlib.util.module_from_spec(spec)
+                        sys.modules["skills_engagement_audit"] = mod
+                        spec.loader.exec_module(mod)
+                        eng_fn = getattr(mod, "audit_engagement", None)
+                        if eng_fn:
+                            return lambda site: eng_fn(site, options=options)
+            except Exception:
+                pass
+            return get_mock_engagement_success
+
+
 class AuditOrchestrator:
     """
     Coordinates specialized agent skills, validates findings, deduplicates,
@@ -84,14 +118,20 @@ class AuditOrchestrator:
         discoverability_runner: Optional[Callable[[str], Dict[str, Any]]] = None,
         engagement_runner: Optional[Callable[[str], Dict[str, Any]]] = None,
         discoverability_options: Optional[Dict[str, Any]] = None,
+        engagement_options: Optional[Dict[str, Any]] = None,
     ):
         self.discoverability_options = discoverability_options
+        self.engagement_options = engagement_options
+
         if discoverability_runner is not None:
             self.discoverability_runner = discoverability_runner
         else:
             self.discoverability_runner = _get_discoverability_runner(options=self.discoverability_options)
 
-        self.engagement_runner = engagement_runner or get_mock_engagement_success
+        if engagement_runner is not None:
+            self.engagement_runner = engagement_runner
+        else:
+            self.engagement_runner = _get_engagement_runner(options=self.engagement_options)
 
     def run_audit(self, site_input: str) -> AuditReport:
         """
@@ -149,6 +189,12 @@ class AuditOrchestrator:
             eng_findings, eng_rejections, eng_err = validate_module_payload(
                 eng_payload, expected_skill="engagement-audit"
             )
+
+            # Preserve explicit limitations reported by the skill
+            if isinstance(eng_payload, dict) and isinstance(eng_payload.get("limitations"), list):
+                for lim in eng_payload["limitations"]:
+                    if isinstance(lim, str) and lim.strip() and lim.strip() not in limitations:
+                        limitations.append(lim.strip())
 
             if eng_err:
                 module_statuses["on_site_engagement"] = {

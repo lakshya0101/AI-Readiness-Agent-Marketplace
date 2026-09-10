@@ -1,5 +1,5 @@
 ---
-name: On-Site Engagement Audit
+name: engagement-audit
 description: Audits a webpage's structural engagement signals to evaluate orientation, context retention, navigation, and actionability.
 ---
 

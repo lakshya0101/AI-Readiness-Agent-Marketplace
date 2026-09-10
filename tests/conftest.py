@@ -52,3 +52,6 @@ _register_skill_alias("audit-orchestrator", "audit_orchestrator")
 
 # Register ai-discoverability
 _register_skill_alias("ai-discoverability", "ai_discoverability")
+
+# Register engagement-audit
+_register_skill_alias("engagement-audit", "engagement_audit")
