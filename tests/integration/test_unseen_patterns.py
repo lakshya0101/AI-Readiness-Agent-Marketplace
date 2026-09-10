@@ -587,3 +587,199 @@ class TestUnseenWebsitePatterns:
         # Missing primary landmark should NOT trigger because <article> serves as primary content container
         landmark_findings = [f for f in disc_findings if "landmark" in f.title.lower()]
         assert len(landmark_findings) == 0
+
+    # -------------------------------------------------------------------------
+    # 13. Highly Readable Page with No JSON-LD
+    # -------------------------------------------------------------------------
+    @patch("urllib.request.urlopen")
+    @patch("skills.ai_discoverability.scripts.audit_discoverability.HttpClient.fetch")
+    def test_13_highly_readable_page_no_jsonld(self, mock_disc_fetch, mock_eng_urlopen):
+        """A page with clear headings, main landmark, and rich body text but no JSON-LD has zero critical/high errors."""
+        html = b"""<!DOCTYPE html>
+        <html>
+        <head><title>History of Modern Typography - Essay</title></head>
+        <body>
+            <header>
+                <nav>
+                    <a href="/">Home</a>
+                    <a href="/essays">Essays</a>
+                </nav>
+            </header>
+            <main>
+                <h1>The Evolution of Digital Typography</h1>
+                <p>Digital typography emerged alongside bitmap displays in the early 1970s. PostScript outline fonts created scalable vectors that standardized publishing across platforms.</p>
+                <p>TrueType and OpenType formats unified font rendering across major operating systems, enabling dynamic kerning and rich glyph substitution tables.</p>
+            </main>
+        </body>
+        </html>"""
+
+        mock_disc_fetch.side_effect = lambda url: _mock_resp(url, html) if "robots.txt" not in url else _mock_resp(url, b"User-agent: *\nAllow: /\n")
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = html
+        mock_resp.__enter__.return_value = mock_resp
+        mock_eng_urlopen.return_value = mock_resp
+
+        orchestrator = AuditOrchestrator()
+        report = orchestrator.run_audit("https://typography-history.org")
+
+        assert report.summary.critical == 0
+        assert report.summary.high == 0
+
+    # -------------------------------------------------------------------------
+    # 14. Highly Crawlable Site without Sitemap Directive
+    # -------------------------------------------------------------------------
+    @patch("urllib.request.urlopen")
+    @patch("skills.ai_discoverability.scripts.audit_discoverability.HttpClient.fetch")
+    def test_14_highly_crawlable_site_no_sitemap_directive(self, mock_disc_fetch, mock_eng_urlopen):
+        """A site with valid robots.txt permitting crawlers without Sitemap directive does not produce critical blockers."""
+        html = b"""<!DOCTYPE html>
+        <html>
+        <head><title>Open Knowledge Hub</title></head>
+        <body><main><h1>Open Knowledge Hub</h1><p>Public open knowledge repository.</p></main></body>
+        </html>"""
+
+        def disc_side_effect(url):
+            if "robots.txt" in url:
+                return _mock_resp(url, b"User-agent: *\nAllow: /\n")
+            return _mock_resp(url, html)
+
+        mock_disc_fetch.side_effect = disc_side_effect
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = html
+        mock_resp.__enter__.return_value = mock_resp
+        mock_eng_urlopen.return_value = mock_resp
+
+        orchestrator = AuditOrchestrator()
+        report = orchestrator.run_audit("https://openknowledge.org")
+
+        assert report.summary.critical == 0
+        # AI discoverability status is success
+        assert report.modules["ai_discoverability"]["status"] == "success"
+
+    # -------------------------------------------------------------------------
+    # 15. Contextual Links without <nav>
+    # -------------------------------------------------------------------------
+    @patch("urllib.request.urlopen")
+    @patch("skills.ai_discoverability.scripts.audit_discoverability.HttpClient.fetch")
+    def test_15_contextual_links_without_nav_avoids_navigation_failure(self, mock_disc_fetch, mock_eng_urlopen):
+        """A page with multiple in-body contextual links does not trigger ENG-401 navigation failure."""
+        html = b"""<!DOCTYPE html>
+        <html>
+        <head><title>Compiler Architecture Overview</title></head>
+        <body>
+            <main>
+                <h1>Compiler Optimization Passes</h1>
+                <p>Learn more about our <a href="/lexer">Lexical Analysis</a>, <a href="/parser">AST Generation</a>, and <a href="/codegen">Code Generation</a> pipelines.</p>
+            </main>
+        </body>
+        </html>"""
+
+        mock_disc_fetch.side_effect = lambda url: _mock_resp(url, html) if "robots.txt" not in url else _mock_resp(url, b"User-agent: *\nAllow: /\n")
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = html
+        mock_resp.__enter__.return_value = mock_resp
+        mock_eng_urlopen.return_value = mock_resp
+
+        orchestrator = AuditOrchestrator()
+        report = orchestrator.run_audit("https://compiler-design.dev")
+
+        eng_findings = [f for f in report.findings if f.category == "on_site_engagement"]
+        # ENG-401 must NOT trigger because total_links (3) >= 2
+        assert not any(f.id == "ENG-401" for f in eng_findings)
+
+    # -------------------------------------------------------------------------
+    # 16. role='main' Semantic Container Recognized
+    # -------------------------------------------------------------------------
+    @patch("urllib.request.urlopen")
+    @patch("skills.ai_discoverability.scripts.audit_discoverability.HttpClient.fetch")
+    def test_16_role_main_recognized_as_landmark(self, mock_disc_fetch, mock_eng_urlopen):
+        """Container with role='main' satisfies landmark requirement and produces no landmark finding."""
+        html = b"""<!DOCTYPE html>
+        <html>
+        <head><title>Cloud Console - Overview</title></head>
+        <body>
+            <div role="main">
+                <h1>Infrastructure Dashboard</h1>
+                <p>Telemetry for active compute clusters across all regions.</p>
+            </div>
+        </body>
+        </html>"""
+
+        mock_disc_fetch.side_effect = lambda url: _mock_resp(url, html) if "robots.txt" not in url else _mock_resp(url, b"User-agent: *\nAllow: /\n")
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = html
+        mock_resp.__enter__.return_value = mock_resp
+        mock_eng_urlopen.return_value = mock_resp
+
+        orchestrator = AuditOrchestrator()
+        report = orchestrator.run_audit("https://cloudconsole.io")
+
+        disc_findings = [f for f in report.findings if f.category == "ai_discoverability"]
+        assert not any("landmark" in f.title.lower() for f in disc_findings)
+
+    # -------------------------------------------------------------------------
+    # 17. Single-CTA Product Page
+    # -------------------------------------------------------------------------
+    @patch("urllib.request.urlopen")
+    @patch("skills.ai_discoverability.scripts.audit_discoverability.HttpClient.fetch")
+    def test_17_single_cta_product_page_no_false_positive(self, mock_disc_fetch, mock_eng_urlopen):
+        """Product page with single 'Buy Now' button satisfies actionability without triggering ENG-501."""
+        html = b"""<!DOCTYPE html>
+        <html>
+        <head><title>Ergonomic Keyboard Model X</title></head>
+        <body>
+            <main>
+                <h1>Ergonomic Keyboard Model X</h1>
+                <p>Split mechanical keyboard designed for maximum posture support and wrist comfort.</p>
+                <button type="button">Buy Now</button>
+            </main>
+        </body>
+        </html>"""
+
+        mock_disc_fetch.side_effect = lambda url: _mock_resp(url, html) if "robots.txt" not in url else _mock_resp(url, b"User-agent: *\nAllow: /\n")
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = html
+        mock_resp.__enter__.return_value = mock_resp
+        mock_eng_urlopen.return_value = mock_resp
+
+        orchestrator = AuditOrchestrator(
+            engagement_options={"inferred_page_type": "product"}
+        )
+        report = orchestrator.run_audit("https://keyboards.shop/model-x")
+
+        eng_findings = [f for f in report.findings if f.category == "on_site_engagement"]
+        assert not any(f.id == "ENG-501" for f in eng_findings)
+
+    # -------------------------------------------------------------------------
+    # 18. Deep Page with Root Link
+    # -------------------------------------------------------------------------
+    @patch("urllib.request.urlopen")
+    @patch("skills.ai_discoverability.scripts.audit_discoverability.HttpClient.fetch")
+    def test_18_deep_page_with_root_link_preserves_context(self, mock_disc_fetch, mock_eng_urlopen):
+        """Deep page with a link to root home '/' preserves site context and avoids ENG-301."""
+        html = b"""<!DOCTYPE html>
+        <html>
+        <head><title>Payment Gateways - Developer Guide</title></head>
+        <body>
+            <p><a href="/">Back to Merchant Hub</a></p>
+            <main>
+                <h1>Payment Gateways Integration</h1>
+                <p>Step-by-step guide for embedding Stripe and PayPal checkout flows.</p>
+            </main>
+        </body>
+        </html>"""
+
+        mock_disc_fetch.side_effect = lambda url: _mock_resp(url, html) if "robots.txt" not in url else _mock_resp(url, b"User-agent: *\nAllow: /\n")
+        mock_resp = MagicMock()
+        mock_resp.read.return_value = html
+        mock_resp.__enter__.return_value = mock_resp
+        mock_eng_urlopen.return_value = mock_resp
+
+        orchestrator = AuditOrchestrator(
+            engagement_options={"entry_type": "deep", "inferred_page_type": "documentation"}
+        )
+        report = orchestrator.run_audit("https://merchanthub.dev/guides/payments")
+
+        eng_findings = [f for f in report.findings if f.category == "on_site_engagement"]
+        # ENG-301 (context loss on deep entry) must NOT trigger because has_home_link is True
+        assert not any(f.id == "ENG-301" for f in eng_findings)
