@@ -1,31 +1,44 @@
 ---
-name: engagement-audit
-description: Specialized audit skill evaluating visitor landing orientation, viewport value clarity, context comprehension, navigation hierarchy, and conversion action affordance.
+name: On-Site Engagement Audit
+description: Audits a webpage's structural engagement signals to evaluate orientation, context retention, navigation, and actionability.
 ---
 
-# On-Site Engagement Audit Skill
+# On-Site Engagement Audit
 
-> **Branch**: `feature/vishesh-engagement`  
-> **Lead**: Vishesh  
-> **Status**: In Development (Contract Defined)
+## Description
+This skill evaluates website engagement signals based purely on observable structural HTML data without subjective visual aesthetic judgments. It analyzes 5 core dimensions:
+1. Landing experience
+2. Information orientation
+3. Deep-page context retention
+4. Navigation
+5. Meaningful next action
 
-## Overview
+## When to Use
+Use this skill when analyzing a website's readiness for AI and organic visitor engagement, especially checking deep-page entries where an AI directly links a user to a nested page.
 
-The `engagement-audit` skill performs an evidence-backed audit of the human and agent-directed on-site experience, evaluating how effectively a website orients visitors, communicates its core value proposition, facilitates navigation, and prompts meaningful next actions.
+## Inputs
+Accepts JSON through stdin containing:
+- `url` (string)
+- `html` (string)
+- `entry_type` (string: "landing" or "deep")
+- `inferred_page_type` (optional string)
 
-## Audit Lifecycle (Methodology)
+## Procedure
+1. The orchestrator collects the target URL's HTML.
+2. The orchestrator pipes a JSON payload to `scripts/audit_engagement.py`.
+3. The module infers the page type if missing.
+4. It evaluates the page against the 5 dimensions, using conservative false-positive controls.
+5. Emits strict, evidence-backed findings to stdout.
 
-1. **Landing**: First visual impression, above-the-fold viewport clarity, layout stability.
-2. **Orientation**: Immediate identification of site purpose, target audience, and primary offering.
-3. **Context**: Explanatory content depth, readability, visual hierarchy, credibility signals.
-4. **Navigation**: Menu clarity, search accessibility, internal link logical hierarchy.
-5. **Next Action**: Visual contrast and affordance of primary Call-to-Action (CTA) elements, friction reduction.
+## Output
+Outputs a JSON array of Findings following the team's agreed schema. Errors/diagnostics print to stderr.
 
-## Contract Compliance
+## Dependencies/Tools
+- Python 3 (Standard library only; no external dependencies)
 
-All findings produced by this skill must adhere to the standard finding contract:
-- Category: `on_site_engagement`
-- Finding ID format: `ENG-001`, `ENG-002`, etc.
-- Concrete, non-empty observable evidence is required.
+## AI-Referred Deep-Entry Test
+This skill treats deep pages as first-time interactions. When `entry_type` is "deep", it evaluates if the user can understand the brand, page purpose, relationship to broader offering, and meaningful next actions, simulating a direct AI recommendation.
 
-See [finding_schema.json](../audit-orchestrator/references/finding_schema.json) for contract specifications.
+## Limitations
+- Analyzes structural DOM only; cannot evaluate CSS aesthetics or visual layout.
+- Evaluates a single supplied page, does not crawl.

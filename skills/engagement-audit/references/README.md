@@ -1,5 +1,5 @@
-# On-Site Engagement References
+# References
 
-This directory stores documentation, UX evaluation criteria, and reference checklists for the On-Site Engagement audit skill.
+This directory contains the detailed heuristics, audit criteria, false-positive controls, and severity logic for the On-Site Engagement Audit module. 
 
-All findings generated must conform to [finding_schema.json](../../audit-orchestrator/references/finding_schema.json).
+These documents serve as references for human maintainers, skill authors, and anyone reviewing the module's behavior. They intentionally offload verbose rule descriptions from the primary `SKILL.md` to keep the agent prompt concise while preserving full documentation.
