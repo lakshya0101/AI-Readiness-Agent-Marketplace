@@ -16,22 +16,46 @@ This skill evaluates website engagement signals based purely on observable struc
 ## When to Use
 Use this skill when analyzing a website's readiness for AI and organic visitor engagement, especially checking deep-page entries where an AI directly links a user to a nested page.
 
+## Public Entrypoint
+
+The canonical programmatic entrypoint is:
+
+```python
+from skills.engagement_audit.scripts import audit_engagement
+
+payload = audit_engagement(site="https://example.com", options=None)
+```
+
+Or via CLI / stdin:
+
+```bash
+python skills/engagement-audit/scripts/audit_engagement.py < payload.json
+```
+
 ## Inputs
-Accepts JSON through stdin containing:
-- `url` (string)
-- `html` (string)
-- `entry_type` (string: "landing" or "deep")
-- `inferred_page_type` (optional string)
+Accepts JSON through stdin or programmatic arguments containing:
+- `site` / `url` (string)
+- `html` (optional string)
+- `options` (dict: `entry_type`, `inferred_page_type`, `timeout`)
 
 ## Procedure
-1. The orchestrator collects the target URL's HTML.
-2. The orchestrator pipes a JSON payload to `scripts/audit_engagement.py`.
+1. The orchestrator collects the target URL's HTML or delegates fetching to the skill.
+2. The skill executes `audit_engagement`.
 3. The module infers the page type if missing.
 4. It evaluates the page against the 5 dimensions, using conservative false-positive controls.
-5. Emits strict, evidence-backed findings to stdout.
+5. Emits strict, evidence-backed findings adhering to the standard schema.
 
 ## Output
-Outputs a JSON array of Findings following the team's agreed schema. Errors/diagnostics print to stderr.
+Returns a standard module result dictionary:
+```json
+{
+  "skill": "engagement-audit",
+  "status": "success",
+  "findings": [...],
+  "error": null,
+  "limitations": [...]
+}
+```
 
 ## Dependencies/Tools
 - Python 3 (Standard library only; no external dependencies)
