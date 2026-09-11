@@ -224,9 +224,13 @@ class ExtractInspector:
         url_lower = url.lower()
         
         # Product detection
+        has_price_in_text = (
+            any("$" in p for p in read_obs.paragraphs)
+            or any("$" in text for _, text in read_obs.headings)
+        )
         is_product_likely = (
             ("/product/" in url_lower or "/p/" in url_lower or "/item/" in url_lower) and
-            ("buy" in title_lower or "price" in title_lower or "$" in read_obs.visible_text)
+            ("buy" in title_lower or "price" in title_lower or has_price_in_text)
         )
         if is_product_likely and not any(t in obs.types_found for t in ["Product", "Offer"]):
             # Double check if it's really a product, maybe check html structural tags?
@@ -238,14 +242,14 @@ class ExtractInspector:
                 evidence=f"Page at {url} appears to represent a product/offer (based on URL/title/content) but lacks 'Product' or 'Offer' JSON-LD schema.",
                 why_it_matters="Missing product schema prevents rich shopping results and AI agent product extraction.",
                 suggested_action_summary="Add Product structured data",
-                    suggested_action_details="Add Schema.org/Product and Schema.org/Offer JSON-LD to product pages.",
-                    methodology="Extract"
+                suggested_action_details="Add Schema.org/Product and Schema.org/Offer JSON-LD to product pages.",
+                methodology="Extract"
             ))
 
         # Article detection
         is_article_likely = (
             ("/blog/" in url_lower or "/article/" in url_lower or "/news/" in url_lower) and
-            read_obs.structural_tags.get("p", 0) > 3 and
+            read_obs.paragraph_count > 3 and
             obs.landmarks.get("article", False)
         )
         if is_article_likely and not any(t in obs.types_found for t in ["Article", "NewsArticle", "BlogPosting"]):
@@ -256,8 +260,8 @@ class ExtractInspector:
                 evidence=f"Page at {url} uses <article> landmarks and paragraph structures typical of an article, but lacks 'Article' schema.",
                 why_it_matters="Article schema is critical for news aggregators, reading modes, and AI summary bots.",
                 suggested_action_summary="Add Article structured data",
-                    suggested_action_details="Add Schema.org/Article JSON-LD to blog posts and news articles.",
-                    methodology="Extract"
+                suggested_action_details="Add Schema.org/Article JSON-LD to blog posts and news articles.",
+                methodology="Extract"
             ))
 
         return findings
