@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AuditFindingContract",
+  "type": "object",
+  "required": [
+    "id",
+    "category",
+    "subcategory",
+    "title",
+    "severity",
+    "evidence",
+    "why_it_matters",
+    "suggested_action"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the finding (e.g. DISC-001, ENG-001)",
+      "pattern": "^[A-Z]{3,4}-[0-9]{3,4}$"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["ai_discoverability", "on_site_engagement"],
+      "description": "High-level domain category of the finding"
+    },
+    "subcategory": {
+      "type": "string",
+      "description": "Fine-grained audit subcategory (e.g. structured_data, crawlability, orientation, navigation)"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Clear and concise title describing the discovered issue"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low"],
+      "description": "Evidence-based severity of the issue"
+    },
+    "evidence": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Specific observable evidence proving the finding. Must never be empty or hallucinated."
+    },
+    "why_it_matters": {
+      "type": "string",
+      "minLength": 3,
+      "description": "Explanation of the mechanism and impact on AI discovery or user engagement"
+    },
+    "suggested_action": {
+      "type": "object",
+      "required": ["summary", "details", "priority"],
+      "properties": {
+        "summary": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Concise summary of recommended remedy"
+        },
+        "details": {
+          "type": "string",
+          "minLength": 3,
+          "description": "Specific, actionable implementation guidance"
+        },
+        "priority": {
+          "type": "string",
+          "enum": ["critical", "high", "medium", "low"],
+          "description": "Priority score for addressing the recommendation"
+        }
+      },
+      "additionalProperties": true
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["high", "medium", "low"],
+      "description": "Optional confidence score based on directness of evidence"
+    },
+    "affected_pages": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional list of URLs where the issue was observed"
+    },
+    "evidence_type": {
+      "type": "string",
+      "description": "Optional type of evidence (e.g. DOM, HTTP_HEADER, ROBOTS_TXT, SCHEMA_ORG)"
+    },
+    "methodology": {
+      "type": "string",
+      "description": "Optional methodology stage (e.g. Reach, Read, Extract, Understand, Identify, Trust)"
+    },
+    "remediation_complexity": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Optional estimated effort/complexity to fix"
+    }
+  },
+  "additionalProperties": true
+}

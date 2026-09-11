@@ -22,7 +22,11 @@ It serves as the first specialized evaluation dimension within the Brand AI Read
 The canonical programmatic entrypoint is:
 
 ```python
-from skills.ai_discoverability.scripts import audit_discoverability
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path("skills/ai-discoverability/scripts")))
+from audit_discoverability import audit_discoverability
 
 payload = audit_discoverability(site="https://example.com", options=None)
 ```
@@ -30,7 +34,7 @@ payload = audit_discoverability(site="https://example.com", options=None)
 Or via CLI:
 
 ```bash
-python -m skills.ai_discoverability.scripts.audit_discoverability https://example.com
+python skills/ai-discoverability/scripts/audit_discoverability.py https://example.com
 ```
 
 ### Input Contract

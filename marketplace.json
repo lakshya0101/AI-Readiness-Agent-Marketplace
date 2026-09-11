@@ -1,0 +1,26 @@
+{
+  "name": "brand-ai-readiness-marketplace",
+  "version": "1.0.0",
+  "description": "Agent Skill Marketplace for evidence-backed Website AI Readiness and On-Site Engagement Audits",
+  "entrypoint": "audit-orchestrator",
+  "skills": [
+    {
+      "name": "audit-orchestrator",
+      "path": "skills/audit-orchestrator",
+      "entrypoint": true,
+      "description": "Main orchestrator coordinating specialized audit skills, validating findings, deduplicating, and generating the final prioritized audit report."
+    },
+    {
+      "name": "ai-discoverability",
+      "path": "skills/ai-discoverability",
+      "entrypoint": false,
+      "description": "Specialized audit skill assessing technical crawlability, structured data, extractability, entity clarity, and brand citation readiness."
+    },
+    {
+      "name": "engagement-audit",
+      "path": "skills/engagement-audit",
+      "entrypoint": false,
+      "description": "Specialized audit skill assessing visitor landing orientation, context clarity, navigation efficiency, and conversion next-action clarity."
+    }
+  ]
+}
