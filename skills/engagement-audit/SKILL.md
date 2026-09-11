@@ -21,7 +21,11 @@ Use this skill when analyzing a website's readiness for AI and organic visitor e
 The canonical programmatic entrypoint is:
 
 ```python
-from skills.engagement_audit.scripts import audit_engagement
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path("skills/engagement-audit/scripts")))
+from audit_engagement import audit_engagement
 
 payload = audit_engagement(site="https://example.com", options=None)
 ```
@@ -29,7 +33,7 @@ payload = audit_engagement(site="https://example.com", options=None)
 Or via CLI / stdin:
 
 ```bash
-python skills/engagement-audit/scripts/audit_engagement.py < payload.json
+python skills/engagement-audit/scripts/audit_engagement.py https://example.com
 ```
 
 ## Inputs

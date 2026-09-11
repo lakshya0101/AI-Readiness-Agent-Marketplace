@@ -9,7 +9,7 @@ The **AI-Readiness Agent Marketplace** is an Agent Skill Marketplace designed fo
 ---
 
 [![Runtime: Python Standard Library](https://img.shields.io/badge/Runtime-Python_3.10+_StdLib-blue.svg)](#operational-safety--scope)
-[![Tests: 195 Passing](https://img.shields.io/badge/Tests-195_Passing-brightgreen.svg)](#automated-testing--verification)
+[![Tests: 200 Passing](https://img.shields.io/badge/Tests-200_Passing-brightgreen.svg)](#automated-testing--verification)
 [![Package Size: ~140 KB](https://img.shields.io/badge/Package_Size-~140_KB_(<50MB)-success.svg)](#repository-structure)
 [![Marketplace Entrypoint: audit-orchestrator](https://img.shields.io/badge/Marketplace_Entrypoint-audit--orchestrator-orange.svg)](#marketplace-architecture--skill-composition)
 [![License: MIT](https://img.shields.io/badge/License-MIT-lightgrey.svg)](LICENSE)
@@ -216,7 +216,7 @@ The orchestrator produces a consolidated report available in both human-readable
 | **Audit Domains** | 2 (AI Discoverability, On-Site Engagement) |
 | **Discoverability Stages** | 6 (Reach, Read, Extract, Understand, Identify, Trust) |
 | **Engagement Dimensions** | 5 (Landing, Orientation, Context, Navigation, Next Actions) |
-| **Automated Tests** | 195 tests passing (0 failures, 0 skipped) |
+| **Automated Tests** | 200 tests passing (0 failures, 0 skipped) |
 | **Runtime Dependencies** | Pure Python Standard Library (no third-party pip dependencies) |
 | **Audit Mode** | Read-only by design (passive HTTP inspection) |
 | **Release Package Size** | ~140 KB (139.8 KB / 62 files, well below the 50 MB limit) |
@@ -242,6 +242,27 @@ python skills/audit-orchestrator/scripts/orchestrator.py https://example.com --j
 python skills/audit-orchestrator/scripts/orchestrator.py https://example.com --out report.json
 ```
 
+### Run Programmatically via Python API
+
+```python
+import sys
+from pathlib import Path
+
+# Add orchestrator script path
+sys.path.insert(0, str(Path("skills/audit-orchestrator/scripts")))
+from orchestrator import AuditOrchestrator
+
+orchestrator = AuditOrchestrator()
+report = orchestrator.run_audit("https://example.com")
+print(report.to_dict())
+```
+
+### Input Validation & CLI Error Behavior
+
+Input URLs undergo strict pre-flight syntactic validation before network dispatch:
+- **Valid URLs**: Fully qualified HTTP/HTTPS URLs (e.g., `https://example.com`) proceed to multi-stage auditing.
+- **Invalid / Malformed URLs**: When an unparseable or scheme-less string is provided (e.g. `not-a-url`), the CLI emits a clear plain-text error message to `stderr` (`Error executing audit: Invalid audit target input: ...`) and terminates with exit code `1`.
+
 ---
 
 ## 11. Automated Testing & Verification
@@ -253,8 +274,8 @@ The test suite validates contract enforcement, stage heuristics, engagement dime
 python -m pytest tests/ -v
 ```
 
-### Verified Test Suite Breakdown (195 Passing Tests)
-- **AI Discoverability Unit & Stage Tests (128 tests)**: `Reach`, `Read`, `Extract`, `Understand`, `Identify`, `Trust` stages.
+### Verified Test Suite Breakdown (200 Passing Tests)
+- **AI Discoverability Unit & Stage Tests (133 tests)**: `Reach`, `Read`, `Extract`, `Understand`, `Identify`, `Trust` stages, including ReadObservation contract cross-stage regression coverage.
 - **On-Site Engagement Unit Tests (22 tests)**: Orientation, heading structures, navigation landmarks, and CTA detectors.
 - **Orchestrator Contract & Schema Validation (13 tests)**: Input URL sanitization, finding envelope validation, and report generation.
 - **Integration & Skill Composition (14 tests)**: Multi-skill execution, cross-skill deduplication, and graceful degradation.
@@ -286,12 +307,12 @@ AI-Readiness-Agent-Marketplace/
 │       ├── SKILL.md                    # Engagement skill specification
 │       ├── references/                 # Engagement criteria documentation
 │       └── scripts/                    # 5-dimension evaluator and DOM parser
-├── tests/                              # Automated test suite (195 tests)
+├── tests/                              # Automated test suite (200 tests)
 │   ├── conftest.py                     # Module resolution and test fixtures
 │   ├── discoverability/                # Discoverability stage test suites
 │   ├── integration/                    # Orchestration and 18-pattern test matrix
 │   └── test_engagement_audit.py        # Engagement unit test suite
-└── scripts/                            # Release packaging and validation tools
+└── scripts/                            # Release packaging tools (dev repository; excluded from zip artifact)
     └── package_release.py              # Deterministic ZIP packager and verifier
 ```
 

@@ -78,7 +78,12 @@ See [report_schema.json](references/report_schema.json) for schema details.
 
 Programmatic usage:
 ```python
-from skills.audit_orchestrator.scripts import AuditOrchestrator
+import sys
+from pathlib import Path
+
+# Add skill scripts directory to sys.path
+sys.path.insert(0, str(Path("skills/audit-orchestrator/scripts")))
+from orchestrator import AuditOrchestrator
 
 orchestrator = AuditOrchestrator()
 report = orchestrator.run_audit("https://example.com")
@@ -87,5 +92,5 @@ print(report.to_dict())
 
 CLI usage:
 ```bash
-python -m skills.audit-orchestrator.scripts.orchestrator https://example.com --json
+python skills/audit-orchestrator/scripts/orchestrator.py https://example.com --json
 ```
