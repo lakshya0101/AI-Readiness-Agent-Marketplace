@@ -23,6 +23,9 @@ The **AI-Readiness Agent Marketplace** provides autonomous AI agents with specia
 
 Operating through a single designated entrypoint (`audit-orchestrator`), the marketplace coordinates domain-specific evaluation engines to inspect server payloads, parse DOM structures, validate semantic metadata, and produce evidence-backed findings alongside prioritized remediation plans.
 
+> [!NOTE]
+> **Core Definition**: A reusable Agent Skill Marketplace that combines technical AI discoverability and human on-site engagement auditing into one unified, evidence-backed workflow.
+
 ```text
 Target Website URL ──▶ audit-orchestrator ──▶ [ai-discoverability + engagement-audit] ──▶ Evidence-Backed Action Plan
 ```
@@ -139,7 +142,8 @@ When an AI assistant directs a user to a specific deep link, that destination pa
 
 The marketplace rejects subjective guesses and generic advice. Every finding produced by any skill conforms to a strict contract grounded in observable DOM and network evidence:
 
-$$\text{Observable Evidence} \longrightarrow \text{Failure Mechanism} \longrightarrow \text{Actionable Remediation}$$
+> [!TIP]
+> **Verification Principle**: Observable Evidence $\longrightarrow$ Failure Mechanism $\longrightarrow$ Actionable Remediation. Findings are never speculative assertions; every issue requires verifiable DOM selectors or HTTP headers.
 
 ### Finding Contract Example
 
@@ -203,6 +207,9 @@ The `audit-orchestrator` aggregates findings across all executed skills, validat
 
 The marketplace is engineered from the ground up to be safe for automated scanning against any public web property.
 
+> [!IMPORTANT]
+> **Safety Invariants**: Pure passive inspection (`GET`/`HEAD` only) with bounded crawl budgets, zero state mutation, standard-library execution, and strict `robots.txt` compliance.
+
 | Guardrail | Enforcement Mechanism | Safety Guarantee |
 | :--- | :--- | :--- |
 | **Read-Only Inspection** | Passive HTTP `GET` and `HEAD` requests only. | Zero state mutations, form submissions, or site modifications. |
@@ -217,6 +224,9 @@ The marketplace is engineered from the ground up to be safe for automated scanni
 ## Validation & Generalization
 
 The marketplace implementation is verified through comprehensive automated testing, contract validation, and real-world public site verification.
+
+> [!NOTE]
+> **Engineering Verification**: 200 automated tests passing across 5 dedicated test suites, validated against 18 synthetic edge-case patterns and live public websites.
 
 ### Verification Matrix
 
@@ -326,6 +336,20 @@ This project is packaged as a self-contained Agent Skill Marketplace compliant w
 
 ---
 
-## License
+<div align="center">
 
-This project is licensed under the [MIT License](LICENSE).
+### Built for Adobe University Hackathon 2026
+
+**AI-Readiness Agent Marketplace**
+
+Designed and developed by:
+
+**Lakshya Dogra · Aditya Agrawal · Vishesh Nigam**
+
+<br/>
+
+© 2026 Lakshya Dogra, Aditya Agrawal, and Vishesh Nigam. All rights reserved.
+
+*Built as an AI-readiness auditing prototype for the Adobe University Hackathon 2026.*
+
+</div>
